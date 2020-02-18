@@ -11,9 +11,9 @@
         background-color: white;
         border: 2px solid red;
         color: red;
-        padding: 10px 25px;
+        padding: 5px 15px;
         text-align: center;
-        font-size: 16px;
+        font-size: 20px;
         cursor: pointer;
         border-radius: 5px;
       }
@@ -49,8 +49,8 @@
             <td><%= url %></td>
             <td><%= urls[url] %></td>
             <td>
-              <form method="POST" action="/urls/9sm5xK/delete">
-                <button class="button">Delete</button>
+              <form method="POST" action="/urls/<%= url %>/delete">
+                <button type="submit" class="button">Delete</button>
               </form>
             </td>
           </tr>
