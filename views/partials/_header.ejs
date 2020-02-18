@@ -16,21 +16,33 @@
       <div class="navbar-nav">
         <a class="nav-item nav-link" href="/urls">My URLs</a>
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
-        <% if(!username){ %>
-        <form action="/login" method="POST">
-          <input type="text" name="username" /><button type="submit">
-            Login
-          </button>
-        </form>
-        <% } else{%>
-        <p style="color: rgba(255,255,255,.5)">Logged in as <%= username %></p>
-        <form action="/logout" method="POST">
-          <button type="submit">
-            logout
-          </button>
-        </form>
-        <% } %>
       </div>
+      <% if(!username){ %>
+      <form action="/login" method="POST">
+        <input placeholder="Username" type="text" name="username" />
+        <button
+          type="submit"
+          class="btn"
+          style="color: rgba(0,0,0,0.4);border: 2px solid rgba(0,0,0,0.4)"
+        >
+          Login
+        </button>
+      </form>
+      <% } else {%>
+      <span
+        style="color: rgba(255, 255, 255, 0.5); font-size: 16px; vertical-align: middle; padding-right: 15px;"
+        >Logged in as <%= username %></span
+      >
+      <form action="/logout" method="POST">
+        <button
+          type="submit"
+          class="btn"
+          style="color: rgba(0,0,0,0.4);border: 2px solid rgba(0,0,0,0.4)"
+        >
+          Logout
+        </button>
+      </form>
+      <% } %>
     </div>
   </nav>
 </header>
