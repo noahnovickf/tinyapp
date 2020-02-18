@@ -18,7 +18,11 @@
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
       </div>
       <% if(!username){ %>
-      <form action="/login" method="POST">
+      <form
+        action="/login"
+        method="POST"
+        style="display:block; margin: 0 0 0 auto;"
+      >
         <input placeholder="Username" type="text" name="username" />
         <button
           type="submit"
@@ -30,7 +34,7 @@
       </form>
       <% } else {%>
       <span
-        style="color: rgba(255, 255, 255, 0.5); font-size: 16px; vertical-align: middle; padding-right: 15px;"
+        style="display:block; margin: 0 0 0 auto;color: rgba(255, 255, 255, 0.5); font-size: 16px; vertical-align: middle; padding-right: 15px;"
         >Logged in as <%= username %></span
       >
       <form action="/logout" method="POST">
