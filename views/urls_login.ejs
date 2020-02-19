@@ -18,7 +18,9 @@
     </head>
   </head>
   <body>
+    <%- include(`./partials/_header`) %>
     <div>
+      <h2>Login</h2>
       <form method="POST" action="/login">
         <div>
           <input placeholder="Email" id="email" type="email" name="email" />
@@ -28,7 +30,7 @@
         </div>
         <div>
           <button type="submit">
-            Submit
+            Login
           </button>
         </div>
       </form>

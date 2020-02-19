@@ -18,7 +18,9 @@
     </head>
   </head>
   <body>
+    <%- include(`./partials/_header`) %>
     <div>
+      <h2>Register</h2>
       <form method="POST" action="/register">
         <div>
           <input placeholder="Email" id="email" type="email" name="email" />
@@ -28,7 +30,7 @@
         </div>
         <div>
           <button type="submit">
-            Submit
+            Register
           </button>
         </div>
       </form>
