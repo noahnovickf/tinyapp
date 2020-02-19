@@ -16,13 +16,15 @@ const generateRandomString = () => {
   return result;
 };
 
+const users = {};
+
 const urlDatabase = {
   b2xVn2: "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
 
 app.get("/urls", (req, res) => {
-  let templateVars = { urls: urlDatabase, username: req.cookies["username"] };
+  let templateVars = { urls: urlDatabase, user: users[req.cookies["user_id"]] };
   res.render("urls_index", templateVars);
 });
 
@@ -34,7 +36,7 @@ app.post("/urls", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
-  let templateVars = { username: req.cookies["username"] };
+  let templateVars = { user: users[req.cookies["user_id"]] };
   res.render("urls_new", templateVars);
 });
 
@@ -42,7 +44,7 @@ app.get("/urls/:shortURL", (req, res) => {
   let templateVars = {
     shortURL: req.params.shortURL,
     longURL: req.params.longURL,
-    username: req.cookies["username"]
+    user: users[req.cookies["user_id"]]
   };
   res.render("urls_show", templateVars);
 });
@@ -74,13 +76,70 @@ app.post("/urls/:shortURL", (req, res) => {
   res.redirect("/urls");
 });
 
-app.post("/login", (req, res) => {
-  res.cookie("username", req.body.username);
+const checkAuthentification = (email, password) => {
+  for (let id in users) {
+    if (email === users[id].email && password === users[id].password) {
+      return users[id];
+    }
+  }
+};
 
-  res.redirect("/urls");
+app.post("/login", (req, res) => {
+  let user = checkAuthentification(req.body.email, req.body.password);
+  if (user) {
+    res.cookie("user_id", user.id);
+    res.redirect("/urls");
+  } else {
+    res.sendStatus(403);
+  }
 });
 
 app.post("/logout", (req, res) => {
-  res.clearCookie("username");
+  res.clearCookie("user_id");
   res.redirect("/urls");
+});
+
+app.get("/register", (req, res) => {
+  const templateVars = {
+    email: req.body.email,
+    password: req.body.password,
+    user: users[req.cookies.user_id]
+  };
+  res.render("urls_register", templateVars);
+});
+
+const checkEmail = email => {
+  for (let id in users) {
+    if (email === users[id].email) {
+      return true;
+    }
+  }
+};
+
+app.post("/register", (req, res) => {
+  if (!req.body.email || !req.body.password) {
+    res.sendStatus(400);
+  }
+  if (checkEmail(req.body.email)) {
+    res.sendStatus(400);
+  } else {
+    const id = generateRandomString();
+    users[id] = {
+      id: id,
+      email: req.body.email,
+      password: req.body.password
+    };
+    console.log(users);
+    res.cookie("user_id", id);
+    res.redirect("/urls");
+  }
+});
+
+app.get("/login", (req, res) => {
+  const templateVars = {
+    email: req.body.email,
+    password: req.body.password,
+    user: users[req.cookies.user_id]
+  };
+  res.render("urls_login", templateVars);
 });
