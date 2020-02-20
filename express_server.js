@@ -90,8 +90,7 @@ app.get("/urls/:shortURL", (req, res) => {
 });
 
 app.get("/u/:shortURL", (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL];
-  res.redirect(longURL);
+  res.redirect(urlDatabase[req.params.shortURL].longURL);
 });
 
 app.get("/", (req, res) => {
@@ -103,17 +102,26 @@ app.get("/urls.json", (req, res) => {
 });
 
 app.post("/urls/:shortURL/delete", (req, res) => {
-  delete urlDatabase[req.params.shortURL];
-  res.redirect("/urls");
+  if (urlDatabase[req.params.shortURL].userID === req.cookies.user_id) {
+    delete urlDatabase[req.params.shortURL];
+    res.redirect("/urls");
+  } else {
+    res.sendStatus(403);
+  }
 });
 
 app.post("/urls/:shortURL", (req, res) => {
-  urlDatabase[req.params.shortURL] = {
-    longURL: req.body.newLongURL,
-    userID: req.cookies.user_id
-  };
-  res.redirect("/urls");
+  if (urlDatabase[req.params.shortURL].userID === req.cookies.user_id) {
+    urlDatabase[req.params.shortURL] = {
+      longURL: req.body.newLongURL,
+      userID: req.cookies.user_id
+    };
+    res.redirect("/urls");
+  } else {
+    res.sendStatus(403);
+  }
 });
+
 app.get("/login", (req, res) => {
   const templateVars = {
     email: req.body.email,
