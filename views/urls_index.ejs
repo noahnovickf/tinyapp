@@ -64,13 +64,24 @@
           <% for(let url in urls) { %>
           <tr>
             <td><%= url %></td>
-            <td><%= urls[url] %></td>
+            <td><%=urls[url]%></td>
             <td>
-              <a class="a button2" href="/urls/<%=url%>">Edit</a>
+              <a
+                href="/urls/<%= url %>"
+                class="btn"
+                style="color:blue;border: 2px solid blue; border-radius: 5px; padding: 5px 10px;"
+              >
+                Edit
+              </a>
             </td>
             <td>
               <form method="POST" action="/urls/<%= url %>/delete">
-                <button type="submit" class="button">Delete</button>
+                <button
+                  name="deleteButton"
+                  style="background:white;padding:5px; border-radius:5px;border-color: red; color: red;"
+                >
+                  Delete
+                </button>
               </form>
             </td>
           </tr>
