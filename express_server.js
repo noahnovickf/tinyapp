@@ -6,7 +6,11 @@ const cookieParser = require("cookie-parser");
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
-
+//listening on which port
+app.listen(PORT, () => {
+  console.log(`Example app listening on port ${PORT}!`);
+});
+//functions
 const generateRandomString = () => {
   let result = "";
   let char = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -15,22 +19,35 @@ const generateRandomString = () => {
   }
   return result;
 };
-
-const users = {};
-
-const urlDatabase = {
-  b6UTxQ: { longURL: "https://www.tsn.ca", userID: "0qoJOq" },
-  i3BoGr: { longURL: "https://www.google.ca", userID: "345" }
-};
-
 let urlsForUser = id => {
   let userURLdatabase = {};
   for (let shortURL in urlDatabase) {
     if (urlDatabase[shortURL].userID === id) {
-      userURLdatabase[shortURL] = urlDatabase[shortURL].longURL;
+      userURLdatabase[shortURL] = { longURL: urlDatabase[shortURL].longURL };
     }
   }
   return userURLdatabase;
+};
+const checkAuthentification = (email, password) => {
+  for (let id in users) {
+    if (email === users[id].email && password === users[id].password) {
+      return users[id];
+    }
+  }
+};
+const checkEmail = email => {
+  for (let id in users) {
+    if (email === users[id].email) {
+      return true;
+    }
+  }
+};
+//empty object to be filled with users
+const users = {};
+//will be empty object for storing websites and for userURLdatabase to reference
+const urlDatabase = {
+  b6UTxQ: { longURL: "https://www.tsn.ca", userID: "0qoJOq" },
+  i3BoGr: { longURL: "https://www.google.ca", userID: "345" }
 };
 
 app.get("/urls", (req, res) => {
@@ -85,28 +102,26 @@ app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
 
-app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}!`);
-});
-
 app.post("/urls/:shortURL/delete", (req, res) => {
   delete urlDatabase[req.params.shortURL];
   res.redirect("/urls");
 });
 
 app.post("/urls/:shortURL", (req, res) => {
-  urlDatabase[req.params.shortURL] = req.body.newLongURL;
+  urlDatabase[req.params.shortURL] = {
+    longURL: req.body.newLongURL,
+    userID: req.cookies.user_id
+  };
   res.redirect("/urls");
 });
-
-const checkAuthentification = (email, password) => {
-  for (let id in users) {
-    if (email === users[id].email && password === users[id].password) {
-      return users[id];
-    }
-  }
-};
-
+app.get("/login", (req, res) => {
+  const templateVars = {
+    email: req.body.email,
+    password: req.body.password,
+    user: users[req.cookies.user_id]
+  };
+  res.render("urls_login", templateVars);
+});
 app.post("/login", (req, res) => {
   let user = checkAuthentification(req.body.email, req.body.password);
   if (user) {
@@ -131,14 +146,6 @@ app.get("/register", (req, res) => {
   res.render("urls_register", templateVars);
 });
 
-const checkEmail = email => {
-  for (let id in users) {
-    if (email === users[id].email) {
-      return true;
-    }
-  }
-};
-
 app.post("/register", (req, res) => {
   if (!req.body.email || !req.body.password) {
     res.sendStatus(400);
@@ -156,13 +163,4 @@ app.post("/register", (req, res) => {
     res.cookie("user_id", id);
     res.redirect("/urls");
   }
-});
-
-app.get("/login", (req, res) => {
-  const templateVars = {
-    email: req.body.email,
-    password: req.body.password,
-    user: users[req.cookies.user_id]
-  };
-  res.render("urls_login", templateVars);
 });

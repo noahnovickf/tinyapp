@@ -64,7 +64,9 @@
           <% for(let url in urls) { %>
           <tr>
             <td><%= url %></td>
-            <td><%=urls[url]%></td>
+            <% for (let key in urls[url]) { %> <% if (key === "longURL") { %>
+            <td><%=urls[url].longURL%></td>
+            <%} %> <%}%>
             <td>
               <a
                 href="/urls/<%= url %>"
