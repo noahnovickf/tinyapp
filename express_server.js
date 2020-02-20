@@ -4,6 +4,7 @@ const PORT = 8080;
 const bodyParser = require("body-parser");
 const cookieSession = require("cookie-session");
 const bcrypt = require("bcryptjs");
+const { checkAuthentification, generateRandomString } = require("./helpers");
 app.use(
   cookieSession({
     name: "user_id",
@@ -17,14 +18,7 @@ app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
 //functions
-const generateRandomString = () => {
-  let result = "";
-  let char = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  for (let i = 1; i <= 6; i++) {
-    result += char[Math.round(Math.random() * (char.length - 1))];
-  }
-  return result;
-};
+
 let urlsForUser = id => {
   let userURLdatabase = {};
   for (let shortURL in urlDatabase) {
@@ -34,13 +28,7 @@ let urlsForUser = id => {
   }
   return userURLdatabase;
 };
-const checkAuthentification = (email, password) => {
-  for (let id in users) {
-    if (email === users[id].email && password === users[id].password) {
-      return users[id];
-    }
-  }
-};
+
 const checkEmail = email => {
   for (let id in users) {
     if (email === users[id].email) {
@@ -64,6 +52,7 @@ app.get("/urls", (req, res) => {
     };
     res.render("urls_index", templateVars);
   } else {
+    // could send status code but redirecting to login makes more sense to me
     res.redirect("/login");
   }
 });
@@ -87,12 +76,16 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.get("/urls/:shortURL", (req, res) => {
-  let templateVars = {
-    shortURL: req.params.shortURL,
-    longURL: urlDatabase[req.params.shortURL].longURL,
-    user: users[req.session["user_id"]]
-  };
-  res.render("urls_show", templateVars);
+  if (urlDatabase[req.params.shortURL].userID === req.session.user_id) {
+    let templateVars = {
+      shortURL: req.params.shortURL,
+      longURL: urlDatabase[req.params.shortURL].longURL,
+      user: users[req.session["user_id"]]
+    };
+    res.render("urls_show", templateVars);
+  } else {
+    res.sendStatus(403);
+  }
 });
 
 app.get("/u/:shortURL", (req, res) => {
@@ -138,16 +131,7 @@ app.get("/login", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
-  const checkAuthentification = email => {
-    for (let id in users) {
-      if (email === users[id].email) {
-        return users[id];
-      }
-    }
-    return null;
-  };
-
-  let user = checkAuthentification(req.body.email);
+  let user = checkAuthentification(req.body.email, users);
   if (bcrypt.compareSync(req.body.password, user.password)) {
     req.session.user_id = user.id;
     res.redirect("/urls");
