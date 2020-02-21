@@ -19,7 +19,7 @@ Generates a random short URL for any and all valid URLS you can think of. This o
 
 The downloaded app should look something like this:
 
-**REGISTER**
-!["Screenshot of register page"](https://github.com/noahnovickf/tinyapp/blob/master/docs/register-page.png)
 **URLS PAGE**
+!["Screenshot of register page"](https://github.com/noahnovickf/tinyapp/blob/master/docs/register-page.png)
+**REGISTER**
 !["Screenshot of URLs page"](https://github.com/noahnovickf/tinyapp/blob/master/docs/url-page.png)
